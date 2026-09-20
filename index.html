@@ -141,14 +141,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <nav id="mainNav">
     <a class="" onclick="switchView('dashboard')"><span class="full">汇总</span><span class="short">汇总</span></a>
     <a onclick="switchView('analysis')"><span class="full">建设流程规范性预警</span><span class="short">建设流程</span></a>
-    <a onclick="switchView('wireless')"><span class="full">无线物资正向流程通报</span><span class="short">无线物资</span></a>
+    <a onclick="switchView('wireless')" class=""><span class="full">无线物资正向流程通报</span><span class="short">无线物资</span></a>
     <a onclick="switchView('special')"><span class="full">无线专项统计</span><span class="short">专项统计</span></a>
     <a onclick="switchView('tasks')"><span class="full">任务管理</span><span class="short">任务</span></a>
     <a onclick="switchView('board')"><span class="full">公示看板</span><span class="short">看板</span></a>
     <a onclick="switchView('upload')" class="active"><span class="full">上传数据</span><span class="short">上传</span></a>
   </nav>
   <div class="nav-more" id="navMoreHint" title="左右滑动查看更多" style="display: none;">›</div>
-  <div class="time" id="navTime">2026-09-08 周二 18:25:31</div>
+  <div class="time" id="navTime">2026-09-20 周日 10:51:25</div>
   <button class="admin-toggle" id="adminToggle" onclick="toggleAdminMode()" style="margin-left:14px">管理员模式</button>
   <span class="cloud-badge syncing" id="cloudBadge">同步中…</span>
 </div>
@@ -391,12 +391,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <div id="wlDim2Units"></div>
       </div>
       <div class="card dim-section">
-        <div class="dim-header"><h3>考核三：施工打卡 → 完工报告提交</h3><span class="dim-tag" style="background:#7c3aed">阈值 25 天</span></div>
+        <div class="dim-header"><h3>考核三：施工打卡 → 完工报告提交</h3><span class="dim-tag" style="background:#7c3aed">阈值 40 天</span></div>
         <div class="stats" id="wlDim3Stats"></div>
         <div id="wlDim3Units"></div>
       </div>
       <div class="card dim-section">
-        <div class="dim-header"><h3>考核四：物资接收入库 → 完工报告提交</h3><span class="dim-tag" style="background:#7c3aed">阈值 25 天（含未遵循正向流程）</span></div>
+        <div class="dim-header"><h3>考核四：物资接收入库 → 完工报告提交</h3><span class="dim-tag" style="background:#7c3aed">阈值 40 天（含未遵循正向流程）</span></div>
         <div class="stats" id="wlDim4Stats"></div>
         <div id="wlDim4Units"></div>
       </div>
@@ -405,8 +405,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <div class="tab-bar" id="wlTabBar">
           <button class="active" onclick="switchWlTab(1,this)">入库→打卡(10天)</button>
           <button onclick="switchWlTab(2,this)">打卡→审批(1天)</button>
-          <button onclick="switchWlTab(3,this)">打卡→完工(25天)</button>
-          <button onclick="switchWlTab(4,this)">入库→完工(25天)</button>
+          <button onclick="switchWlTab(3,this)">打卡→完工(40天)</button>
+          <button onclick="switchWlTab(4,this)">入库→完工(40天)</button>
         </div>
         <div class="toolbar">
           <select id="wlFilterUnit" onchange="renderWlDetailTable()"><option value="">全部施工单位</option></select>
@@ -438,7 +438,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 <!-- 公示看板 -->
 <div class="view board-view" id="view-board">
-  <div class="board-clock" id="boardClock">2026-09-08 周二 18:25:31</div>
+  <div class="board-clock" id="boardClock">2026-09-20 周日 10:51:25</div>
   <div class="board-stats" id="boardStats"></div>
   <div class="card" style="display:none" id="boardTimeoutCard">
     <h2>⚠️ 超时任务公示</h2>
@@ -1544,8 +1544,8 @@ function runWlAnalysis(){
   renderWlOverall();
   renderWlDimSection(1,wlDim1Results,"接收入库日期","施工打卡日期",10);
   renderWlDimSection(2,wlDim2Results,"施工打卡日期","安装单审批日期",1);
-  renderWlDimSection(3,wlDim3Results,"施工打卡日期","完工报告提交日期",25);
-  renderWlDimSection(4,wlDim4Results,"接收入库日期","完工报告提交日期",25);
+  renderWlDimSection(3,wlDim3Results,"施工打卡日期","完工报告提交日期",40);
+  renderWlDimSection(4,wlDim4Results,"接收入库日期","完工报告提交日期",40);
   var units={};wlFilteredData.forEach(function(r){units[r.contractor]=1;});
   document.getElementById("wlFilterUnit").innerHTML='<option value="">全部施工单位</option>'+Object.keys(units).sort().map(function(u){return '<option value="'+esc(u)+'">'+esc(u)+"</option>";}).join("");
   renderWlDetailTable();renderDashboard();
@@ -1611,8 +1611,8 @@ function scoreDimsForUnit(s){
   var dimMeta=[
     {name:"考核一：接收入库 → 施工打卡",threshold:"10 天"},
     {name:"考核二：施工打卡 → 安装单审批",threshold:"1 天"},
-    {name:"考核三：施工打卡 → 完工报告提交",threshold:"25 天"},
-    {name:"考核四：接收入库 → 完工报告提交",threshold:"25 天"}
+    {name:"考核三：施工打卡 → 完工报告提交",threshold:"40 天"},
+    {name:"考核四：接收入库 → 完工报告提交",threshold:"40 天"}
   ];
   if(!s||!s.dims)return null;
   var scored=dimMeta.map(function(d,i){
@@ -1633,8 +1633,8 @@ function renderWlScoreCard(){
   var dimMeta=[
     {name:"考核一：接收入库 → 施工打卡",threshold:"10 天"},
     {name:"考核二：施工打卡 → 安装单审批",threshold:"1 天"},
-    {name:"考核三：施工打卡 → 完工报告提交",threshold:"25 天"},
-    {name:"考核四：接收入库 → 完工报告提交",threshold:"25 天"}
+    {name:"考核三：施工打卡 → 完工报告提交",threshold:"40 天"},
+    {name:"考核四：接收入库 → 完工报告提交",threshold:"40 天"}
   ];
   if(wlScoreMode==="all"){renderWlScoreCardAll(dimMeta);return;}
   // 按所选单元汇总四个维度
@@ -2021,8 +2021,8 @@ function renderDashboard(){
     // 渲染四个维度的未完成任务列表
     renderDashWlDim(1,wlDim1Results,"入库→打卡（10天）",10,"接收入库日期","施工打卡日期");
     renderDashWlDim(2,wlDim2Results,"打卡→审批（1天）",1,"施工打卡日期","安装单审批日期");
-    renderDashWlDim(3,wlDim3Results,"打卡→完工（25天）",25,"施工打卡日期","完工报告提交日期");
-    renderDashWlDim(4,wlDim4Results,"入库→完工（25天）",25,"接收入库日期","完工报告提交日期");
+    renderDashWlDim(3,wlDim3Results,"打卡→完工（40天）",40,"施工打卡日期","完工报告提交日期");
+    renderDashWlDim(4,wlDim4Results,"入库→完工（40天）",40,"接收入库日期","完工报告提交日期");
   }else{
     document.getElementById("dashWirelessCard").style.display="none";
   }
@@ -2368,8 +2368,8 @@ function exportDailyReport(){
     var dims=[
       {idx:1,title:"维度一：接收入库 → 施工打卡",threshold:10,results:wlDim1Results},
       {idx:2,title:"维度二：施工打卡 → 安装单审批",threshold:1,results:wlDim2Results},
-      {idx:3,title:"维度三：施工打卡 → 完工报告提交",threshold:25,results:wlDim3Results},
-      {idx:4,title:"维度四：接收入库 → 完工报告提交",threshold:25,results:wlDim4Results}
+      {idx:3,title:"维度三：施工打卡 → 完工报告提交",threshold:40,results:wlDim3Results},
+      {idx:4,title:"维度四：接收入库 → 完工报告提交",threshold:40,results:wlDim4Results}
     ];
     html+='<h2>二、无线物资正向流程通报</h2>';
     html+='<div class="kpi">无线任务总数 <b>'+wlFilteredData.length+'</b>　项（'+esc(wlSelectedUnits.join("、"))+'）</div>';
