@@ -210,7 +210,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <a onclick="switchView('upload')" class="active"><span class="full">上传数据</span><span class="short">上传</span></a>
   </nav>
   <div class="nav-more" id="navMoreHint" title="左右滑动查看更多" style="display: none;">›</div>
-  <div class="time" id="navTime">2026-10-10 周六 08:23:38</div>
+  <div class="time" id="navTime">2026-10-10 周六 08:33:20</div>
   <button class="admin-toggle" id="adminToggle" onclick="toggleAdminMode()" style="margin-left:14px">管理员模式</button>
   <span class="cloud-badge" id="cloudBadge" style="display: none;">连接中…</span>
 </div>
@@ -526,7 +526,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 <!-- 公示看板 -->
 <div class="view board-view" id="view-board">
-  <div class="board-clock" id="boardClock">2026-10-10 周六 08:23:38</div>
+  <div class="board-clock" id="boardClock">2026-10-10 周六 08:33:20</div>
   <div class="board-stats" id="boardStats"></div>
   <div class="card" style="display:none" id="boardTimeoutCard">
     <h2>⚠️ 超时任务公示</h2>
@@ -1081,13 +1081,13 @@ function spMatchWithPms(){
   });
   spData.lists.forEach(function(list){
     list.tasks.forEach(function(t){
-      // 清单3/4完工闭环：只看 PMS 明细 BX列（完工报告完成时间）有值才算；BW/BV均不算
-      // 清单1/2仍按原口径（审计签收/交维完成字段）
+      /* 重算前强制重置判定结果，避免旧口径（提交即完成）的残留状态 */
+      t.done=false;t.doneDate="";t.matched=false;
       var r=byCode[t.code];
       if(r){
         t.matched=true;
         if(list.completeType==="complete"){
-          // 仅取 BX列（完工报告完成时间），BW/BV不算闭环
+          // 清单3/4完工闭环：仅取 BX列（完工报告完成时间），BW/BV均不算闭环
           var pd=spFieldDate(r,"完工报告完成时间");
           if(pd){t.done=true;t.doneDate=pd;}
         }else if(list.completeType==="audit"){
@@ -1097,29 +1097,17 @@ function spMatchWithPms(){
           var hd=spFieldDate(r,"割接上线交维完成时间")||spFieldDate(r,"割接上线完成（填报）时间");
           if(hd){t.done=true;t.doneDate=hd;}
         }
-        // 完工报告提交日期仍记在reportDate（用于后续未审核判定），但不参与闭环
+        // 完工报告提交日期仅作"已提交未审核"参考，不参与闭环
         var rd=spFieldDate(r,"完工报告提交日期");
         if(rd)t.reportDate=rd;
-        if(!t.unitName&&r["区县"])t.unitName=spUnitToCounty(r["区县"]);
-        if(!t.constructor&&r["施工单位(变更后)"])t.constructor=spNorm(r["施工单位(变更后)"]);
-      }else if(rawData&&rawData.length){
-        for(var i=0;i<rawData.length;i++){
-          var rr=rawData[i];
-          if(rr.taskCode===t.code){
-            t.matched=true;
-            // rawData 仅保留完工时间，只对 complete 口径有效
-            if(!t.done&&list.completeType==="complete"&&rr.bxDate){
-              t.done=true;t.doneDate=rr.bxDate.toISOString().slice(0,10);
-            }
-            if(!t.unitName&&rr.county)t.unitName=spUnitToCounty(rr.county);
-            break;
-          }
-        }
+        if(!t.unitName&&r["区县"])t.unitName=spUnitToCounty(rr_safe(r));
+        if(!t.constructor&&(r["施工单位(变更后)"]||r["施工单位"]))t.constructor=spNorm(r["施工单位(变更后)"]||r["施工单位"]);
       }
     });
   });
   spData.counties=spCollectCounties();
 }
+function rr_safe(r){return r["区县"];}
 
 function spCollectCounties(){
   var m={};
